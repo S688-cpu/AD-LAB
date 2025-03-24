@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Document Uploader</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div class="max-w-3xl mx-auto p-6">
+        <h1 class="text-2xl font-bold text-center mb-6">Upload a Document</h1>
+        <form id="uploadForm" class="bg-white p-4 shadow rounded-lg flex flex-col items-center">
+            <input type="file" id="fileInput" accept=".pdf,.docx,.xlsx" class="mb-3 p-2 border rounded">
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Upload</button>
+        </form>
+        
+        <h1 class="text-2xl font-bold text-center my-6">Chat with the Document</h1>
+        <form id="queryForm" class="bg-white p-4 shadow rounded-lg">
+            <input type="text" id="queryInput" placeholder="Ask a question..." class="w-full p-2 border rounded mb-3">
+            <input type="hidden" id="indexDirInput">
+            <div class="flex justify-between items-center">
+                <select id="modelSelect" class="p-2 border rounded">
+                    <option value="llama3">Llama 3.1</option>
+                    <option value="gemma:latest">Gemma</option>
+                </select>
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Ask</button>
+            </div>
+        </form>
+        
+        <h2 class="text-xl font-bold mt-6">Response:</h2>
+        <div id="response" class="bg-white p-4 shadow rounded-lg mt-2 min-h-[100px]"></div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('file', document.getElementById('fileInput').files[0]);
+
+            const response = await fetch('/upload', { method: 'POST', body: formData });
+            const result = await response.json();
+
+            if (response.ok) {
+                document.getElementById('indexDirInput').value = document.getElementById('fileInput').files[0].name;
+                alert('File uploaded successfully!');
+            } else {
+                alert('Error: ' + result.error);
+            }
+        });
+
+        document.getElementById('queryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const query = document.getElementById('queryInput').value;
+            const indexDir = document.getElementById('indexDirInput').value;
+            const model = document.getElementById('modelSelect').value;
+
+            if (!query || !indexDir) {
+                alert('Please upload a file and enter a query.');
+                return;
+            }
+
+            const response = await fetch('/query', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query, index_dir: indexDir, model })
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                document.getElementById('response').innerText = result.response;
+            } else {
+                alert('Error: ' + result.error);
+            }
+        });
+    </script>
+</body>
+</html>

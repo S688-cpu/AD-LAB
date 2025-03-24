@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot with File Upload</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Conversational Chatbot</h1>
+
+    <!-- File Upload Section -->
+    <form id="uploadForm">
+        <input type="file" id="fileInput" accept=".pdf,.docx,.xlsx">
+        <button type="submit">Upload</button>
+    </form>
+    <p id="uploadStatus"></p>
+
+    <!-- Chat Section -->
+    <div>
+        <label for="modelSelect">Choose Model:</label>
+        <select id="modelSelect">
+            <option value="llama3">Llama 3</option>
+            <option value="gemma">Gemma</option>
+        </select>
+    </div>
+    
+    <div>
+        <input type="text" id="queryInput" placeholder="Ask something...">
+        <button id="queryBtn">Ask</button>
+    </div>
+
+    <div id="chatOutput"></div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
